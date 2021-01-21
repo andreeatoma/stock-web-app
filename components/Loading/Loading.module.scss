@@ -1,0 +1,18 @@
+@import '../../styles/variables';
+@import '../../styles/animations';
+
+.dollar-sign {
+  background-color: rgba(0, 0, 0, 0.7);
+  width: 25em;
+  height: 5em;
+  padding: 2em;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: color(white);
+  animation: loading 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}

@@ -1,0 +1,27 @@
+
+$colors: (
+    white: #fff,
+    black: #15103a,
+    silver: #bcc2c6,
+    red: #eb4d4b,
+  );
+  
+  @function color($x) {
+    @return map-get($colors, $x);
+  }
+  
+  /** BACKGROUNDS **/
+  %gradientBackground {
+    background-size: 150% auto;
+    background-position: left center;
+  }
+  
+  %blueGradientBackground {
+    color: color(white);
+    background-image: linear-gradient(
+      to right,
+      #2980b9 0%,
+      #3aa3e9 51%,
+      #2980b9 100%
+    );
+  }

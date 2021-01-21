@@ -1,0 +1,26 @@
+@import "variables";
+
+.btn {
+  @extend %gradientBackground;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.1em 0.75em;
+  border-radius: 5px;
+  min-width: 6em;
+  border: 0;
+  color: color(white);
+  cursor: pointer;
+  display: inline-block;
+
+  &:hover {
+    background-position: right center;
+  }
+
+  &:active {
+    background-position: left center;
+  }
+
+  &.btn--blue {
+    @extend %blueGradientBackground;
+  }
+}

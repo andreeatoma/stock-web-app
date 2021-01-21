@@ -1,0 +1,9 @@
+.chart {
+    width: 65vw;
+}
+
+@media screen and (max-width: 1200px) {
+    .chart {
+      width: 100vw;
+    }
+  }
