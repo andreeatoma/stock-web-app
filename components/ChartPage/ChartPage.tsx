@@ -1,4 +1,4 @@
-import React, { LegacyRef } from "react";
+import React from "react";
 import Chart from "chart.js";
 import styles from './ChartPage.module.scss';
 
@@ -9,7 +9,7 @@ interface Props {
 }
 
 class ChartPage extends React.Component<Props> {
-  chartRef = React.createRef() as LegacyRef<HTMLCanvasElement>;
+  chartRef = React.createRef();
 
   componentDidUpdate() {
     const {  symbol, xAxis, yAxis } = this.props;
