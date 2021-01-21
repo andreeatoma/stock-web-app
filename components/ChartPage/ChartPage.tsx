@@ -9,7 +9,7 @@ interface Props {
 }
 
 class ChartPage extends React.Component<Props> {
-  chartRef = React.createRef();
+ chartRef = React.createRef<HTMLCanvasElement>();
 
   componentDidUpdate() {
     const {  symbol, xAxis, yAxis } = this.props;
