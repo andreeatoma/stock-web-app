@@ -29,32 +29,7 @@ class ChartPage extends React.Component<Props> {
       },
       options: {
         responsive: true,
-        tooltips: {
-            mode: 'point'
-        },
-        scales: {
-          xAxes: [
-            {
-              ticks: {
-                display: true,
-              },
-              gridLines: {
-                color: "rgba(0, 0, 0, 0)",
-              },
-            },
-          ],
-          yAxes: [
-            {
-              ticks: {
-                display: true,
-                stepSize: 0,
-              },
-              gridLines: {
-                color: "rgba(0, 0, 0, 0)",
-              },
-            },
-          ],
-        },
+        events: null
       },
     });
   }

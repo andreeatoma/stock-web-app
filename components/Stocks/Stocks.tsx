@@ -8,8 +8,8 @@ import styles from "./Stocks.module.scss";
 
 interface State {
   loading: boolean;
-  stockChartXValues: number[];
-  stockChartOpenValues: string[];
+  stockChartXValues: string[];
+  stockChartOpenValues: number[];
   stockSymbol: string;
   query: string;
   listStocks: Array<object>;
@@ -45,11 +45,12 @@ class Stocks extends React.Component<Props, State> {
     try {
       const newStocks = await StocksService.getStocks(stockSymbol);
       for (let key in newStocks["Monthly Time Series"]) {
-        let date = new Date(key);
-        stockChartXValues.push(`${date.getFullYear()}`);
+        let number = Number(newStocks["Monthly Time Series"][key]["1. open"])
+        stockChartXValues.push(key);
         stockChartOpenValues.push(
-          newStocks["Monthly Time Series"][key]["1. open"]
+         number
         );
+        console.log(stockChartOpenValues)
         this.setState({
           stockSymbol,
           stockChartXValues,
@@ -106,8 +107,8 @@ class Stocks extends React.Component<Props, State> {
         <div className={styles.stocks}>
           <ChartPage
             symbol={stockSymbol}
-            xAxis={stockChartOpenValues}
-            yAxis={stockChartXValues}
+            xAxis={stockChartXValues}
+            yAxis={stockChartOpenValues}
           />
           )
         </div>
