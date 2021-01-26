@@ -1,0 +1,15 @@
+.filter {
+  input {
+    border-radius: 5px;
+    font-size: 1em;
+    outline: 0;
+    padding: 0.5em;
+    &::-moz-focus-inner {
+      border: 0;
+    }
+  }
+  button {
+    padding: 0.5em;
+    margin: 2em auto;
+  }
+}

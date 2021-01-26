@@ -1,5 +1,9 @@
-import Head from 'next/head'
-import Stocks from '../components/Stocks/Stocks'
+import Head from 'next/head';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCoffee } from '@fortawesome/free-solid-svg-icons';
+
+import Stocks from '../components/Stocks/Stocks';
 
 export default function Home() {
   return (
@@ -8,20 +12,17 @@ export default function Home() {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className="main">
-       
       <Stocks />
       </main>
-
       <footer className="footer">
         <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+          href="https://github.com/andreeatoma"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
+         Made with <FontAwesomeIcon width="24" icon={faCoffee} /> and passion by 
+          Diana
         </a>
       </footer>
     </div>
