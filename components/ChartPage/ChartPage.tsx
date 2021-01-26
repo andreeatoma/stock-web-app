@@ -30,9 +30,7 @@ class ChartPage extends React.Component<Props> {
           },
           {
             data: [yAxisAverage],
-            label: "Average",
-
-            // This binds the dataset to the right y axis
+            label: `Average ${symbol}`,
           },
         ],
       },
