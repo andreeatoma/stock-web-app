@@ -10,6 +10,7 @@ import Checkbox from "../Checkbox";
 import FilterStocks from "../FilterStocks/FilterStocks";
 
 import styles from "./Stocks.module.scss";
+import Chart from "chart.js";
 
 interface State {
   loading: boolean;
@@ -18,6 +19,7 @@ interface State {
   stockSymbol: string;
   query: string;
   listStocks: Array<object>;
+  showAverage: boolean;
 }
 interface Props {}
 
@@ -34,6 +36,7 @@ class Stocks extends React.Component<Props, State> {
       stockSymbol: "",
       query: "",
       listStocks: [],
+      showAverage: false,
     };
   }
 
@@ -104,23 +107,50 @@ class Stocks extends React.Component<Props, State> {
         start_date,
         end_date
       );
-
-      filteredStocks["o"].forEach((stock) => stockChartOpenValues.push(stock));
-      filteredStocks["t"].forEach((stock) =>
-        stockChartXValues.push(formatDate(stock * 1000))
-      );
-
-      this.setState({
-        stockSymbol: symbol,
-        stockChartXValues,
-        stockChartOpenValues,
-      });
+      
+      if (filteredStocks["s"] === 'ok') {
+        filteredStocks["o"].forEach((stock) => stockChartOpenValues.push(stock));
+        filteredStocks["t"].forEach((stock) =>
+          stockChartXValues.push(formatDate(stock * 1000))
+        );
+  
+        this.setState({
+          stockSymbol: symbol,
+          stockChartXValues,
+          stockChartOpenValues,
+        });
+      } else {
+        console.warn('No Data Currently Available. Markets are closed during weekends and public holidays. Please filter by previous date.')
+      }
+     
     } catch (err) {
       alert(err);
     } finally {
       this.setState({ loading: false });
     }
   };   
+
+
+  overrideChartWithAverage = () => {
+    const { stockChartOpenValues, stockChartXValues } = this.state;
+    let total = 0;
+
+    for (let i = 0; i < stockChartOpenValues.length; i++) {
+      total += stockChartOpenValues[i];
+    }
+
+    let average = total / stockChartOpenValues.length;
+    
+
+    this.setState({
+      stockChartOpenValues: Array.from(Array(300), (i) => (
+        average
+      )),
+    })
+
+    return average;
+
+  }
 
   render() {
     const {
@@ -131,14 +161,6 @@ class Stocks extends React.Component<Props, State> {
       query,
       listStocks,
     } = this.state;
-
-    let total = 0;
-
-    for (let i = 0; i < stockChartOpenValues.length; i++) {
-      total += stockChartOpenValues[i];
-    }
-
-    let average = total / stockChartOpenValues.length;
 
     return (
       <>
@@ -156,14 +178,13 @@ class Stocks extends React.Component<Props, State> {
             ))}
           </select>
           <FilterStocks onFilter={this.filterData} />
-          <Checkbox value={average} />
+          <Checkbox onChecked={this.overrideChartWithAverage} />
         </div>
         <div className={styles.stocks}>
           <ChartPage
             symbol={stockSymbol}
             xAxis={stockChartXValues}
             yAxis={stockChartOpenValues}
-            yAxisAverage={average}
           />
         </div>
       </>
