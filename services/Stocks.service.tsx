@@ -1,4 +1,4 @@
-const API_KEY = "LOATZ3L01PXZMBVV";
+const API_KEY = "E5EI5LVSXF8PA8BK";
 
 class StocksService {
   static getStocks(symbol: string): Promise<[]> {
@@ -17,7 +17,7 @@ class StocksService {
   }
 
   static filterStocks(symbol: string, start_date: string, end_date: string) {
-    const TOKEN = "c02o04748v6srfkalr00"
+    const TOKEN = "c08lhi748v6vku8ukqp0"
  
     let getTimeStartDate = new Date(start_date).getTime()/1000;
     let getTimeEndDate = new Date(end_date).getTime()/1000;
