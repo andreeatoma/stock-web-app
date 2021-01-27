@@ -28,8 +28,6 @@ export default class Checkbox extends React.Component<Props, State> {
 
   render() {
     const { isChecked } = this.state;
-    let {  onChecked } = this.props;
-
     
     return (
       <div>
@@ -38,7 +36,6 @@ export default class Checkbox extends React.Component<Props, State> {
           type="checkbox"
           onChange={this.onCheck}
           defaultChecked={isChecked}
-          name="average"
           id="average"
         />
       </div>

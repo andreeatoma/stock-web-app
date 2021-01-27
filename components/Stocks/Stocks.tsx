@@ -1,16 +1,18 @@
 import React from "react";
+import debounce from "lodash/debounce";
+
 import Loading from "../Loading/Loading";
 
 import StocksService from "../../services/Stocks.service";
+import SweetAlertService from '../../services/sweet-alert/SweetAlert.service';
 import { formatDate } from "../../services/Utils";
 
 import ChartPage from "../ChartPage/ChartPage";
-import Search from "../search/Search";
+import AsyncSelect from "react-select/async";
 import Checkbox from "../Checkbox";
 import FilterStocks from "../FilterStocks/FilterStocks";
 
 import styles from "./Stocks.module.scss";
-import Chart from "chart.js";
 
 interface State {
   loading: boolean;
@@ -19,12 +21,12 @@ interface State {
   stockSymbol: string;
   query: string;
   listStocks: Array<object>;
-  showAverage: boolean;
 }
 interface Props {}
 
 class Stocks extends React.Component<Props, State> {
   chartRef = React.createRef();
+  debouncedOnLoading: (query: string, callback: any) => void;
 
   constructor(props) {
     super(props);
@@ -36,8 +38,9 @@ class Stocks extends React.Component<Props, State> {
       stockSymbol: "",
       query: "",
       listStocks: [],
-      showAverage: false,
     };
+
+    this.debouncedOnLoading = debounce(this.loadOptions, 500);
   }
 
   componentDidMount() {
@@ -52,7 +55,9 @@ class Stocks extends React.Component<Props, State> {
 
     try {
       const newStocks = await StocksService.getStocks(stockSymbol);
-
+      if (newStocks["Information"]) {
+        SweetAlertService.toast({ type: 'error', text: "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency."});
+      }
       for (let key in newStocks["Monthly Time Series"]) {
         let number = Number(newStocks["Monthly Time Series"][key]["1. open"]);
 
@@ -66,30 +71,7 @@ class Stocks extends React.Component<Props, State> {
         });
       }
     } catch (err) {
-      alert(err);
-    } finally {
-      this.setState({ loading: false });
-    }
-  };
-
-  searchData = async (query: string) => {
-    let listStocks = [];
-
-    this.setState({ loading: true });
-
-    try {
-      const searchedStocks = await StocksService.searchStocks(query);
-
-      searchedStocks["bestMatches"].forEach((stock) => {
-        listStocks.push(stock);
-      });
-
-      this.setState({
-        listStocks,
-        query,
-      });
-    } catch (err) {
-      alert(err);
+      SweetAlertService.toast({ type: 'error', text: err });
     } finally {
       this.setState({ loading: false });
     }
@@ -107,32 +89,32 @@ class Stocks extends React.Component<Props, State> {
         start_date,
         end_date
       );
-      
-      if (filteredStocks["s"] === 'ok') {
-        filteredStocks["o"].forEach((stock) => stockChartOpenValues.push(stock));
+
+      if (filteredStocks["s"] === "ok") {
+        filteredStocks["o"].forEach((stock) =>
+          stockChartOpenValues.push(stock)
+        );
         filteredStocks["t"].forEach((stock) =>
           stockChartXValues.push(formatDate(stock * 1000))
         );
-  
+
         this.setState({
           stockSymbol: symbol,
           stockChartXValues,
           stockChartOpenValues,
         });
       } else {
-        console.warn('No Data Currently Available. Markets are closed during weekends and public holidays. Please filter by previous date.')
+        SweetAlertService.toast({ type: 'error', text:  "No Data Currently Available. Markets are closed during weekends and public holidays. Please filter by previous date."})
       }
-     
     } catch (err) {
-      alert(err);
+      SweetAlertService.toast({ type: 'error', text: err });
     } finally {
       this.setState({ loading: false });
     }
-  };   
-
+  };
 
   overrideChartWithAverage = () => {
-    const { stockChartOpenValues, stockChartXValues } = this.state;
+    const { stockChartOpenValues } = this.state;
     let total = 0;
 
     for (let i = 0; i < stockChartOpenValues.length; i++) {
@@ -140,17 +122,37 @@ class Stocks extends React.Component<Props, State> {
     }
 
     let average = total / stockChartOpenValues.length;
-    
 
     this.setState({
-      stockChartOpenValues: Array.from(Array(300), (i) => (
-        average
-      )),
-    })
+      stockChartOpenValues: Array.from(Array(200), (i) => average),
+    });
 
     return average;
+  };
 
-  }
+  loadOptions = (query: string, callback) => {
+    this.setState({ loading: true });
+
+    StocksService.searchStocks(query)
+      .then((searchedStocks) => {
+        callback(searchedStocks["bestMatches"]);
+      })
+      .catch((err) => {
+        SweetAlertService.toast({ type: 'error', text: err });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
+
+  handleInputChange = (newValue: string) => {
+    const query = newValue.replace(/\W/g, "");
+    this.setState({ query });
+  };
+
+  handleChange = (symbol) => {
+    this.getData(symbol["1. symbol"]);
+  };
 
   render() {
     const {
@@ -158,25 +160,22 @@ class Stocks extends React.Component<Props, State> {
       stockSymbol,
       stockChartOpenValues,
       stockChartXValues,
-      query,
-      listStocks,
     } = this.state;
 
     return (
       <>
         {loading && <Loading />}
         <div className={styles.list}>
-          <Search query={query} onSearch={this.searchData} />
-          <select
-            className="my-5"
-            onChange={(e) => this.getData(e.target.value)}
-          >
-            {listStocks.map((stock) => (
-              <option key={stock["1. symbol"]} value={stock["1. symbol"]}>
-                {stock["1. symbol"]}
-              </option>
-            ))}
-          </select>
+          <div className={styles.select}>
+            <AsyncSelect
+              cacheOptions
+              defaultOptions
+              getOptionLabel={(e) => e["1. symbol"]}
+              loadOptions={this.debouncedOnLoading}
+              onInputChange={this.handleInputChange}
+              onChange={this.handleChange}
+            />
+          </div>
           <FilterStocks onFilter={this.filterData} />
           <Checkbox onChecked={this.overrideChartWithAverage} />
         </div>
